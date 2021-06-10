@@ -1,0 +1,18 @@
+   apiVersion: sources.knative.dev/v1beta1
+   kind: KafkaSource
+   metadata:
+    name: kafka-source-with-sasl
+   spec:
+    net:
+      sasl:
+        enable: true
+    consumerGroup: knative-group
+    bootstrapServers:
+    - my-cluster-kafka-bootstrapppp.kafka.svc:9092
+    topics:
+    - my-topic
+    sink:
+      ref:
+        apiVersion: v1
+        kind: Service
+        name: event-display

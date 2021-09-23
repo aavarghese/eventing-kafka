@@ -134,7 +134,7 @@ data:
 Some failure scenarios are described below:
 
 1. **Pod failure**:
-When a pod/replica in a StatefulSet goes down due to some reason (but its node and zone are healthy), a new replica is spun up by the StatefulSet with the same pod identit (pod can come up on a different node) almost immediately.
+When a pod/replica in a StatefulSet goes down due to some reason (but its node and zone are healthy), a new replica is spun up by the StatefulSet with the same pod identity (pod can come up on a different node) almost immediately.
 All existing vreplica placements will still be valid and no rebalancing is needed.
 There shouldn’t be any degradation in Kafka message processing.
 

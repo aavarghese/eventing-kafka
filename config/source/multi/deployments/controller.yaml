@@ -40,6 +40,8 @@ spec:
               fieldPath: metadata.namespace
         - name: METRICS_DOMAIN
           value: knative.dev/sources
+        - name: K_TRACING_CONFIG
+          value: '{"backend":"zipkin","debug":"true","sample-rate":"1","zipkin-endpoint":"http://otel-collector.observability:9411/api/v2/spans"}'
         - name: CONFIG_OBSERVABILITY_NAME
           value: config-observability
         - name: CONFIG_LEADERELECTION_NAME
@@ -61,13 +63,13 @@ spec:
 
         # The scheduling policy type for placing vreplicas on pods (see type SchedulerPolicyType for enum list)
         - name: SCHEDULER_POLICY_TYPE
-          value: 'MAXFILLUP'
+          value: ''
 
         - name: SCHEDULER_CONFIG
-          value: ''
+          value: 'config-kafka-source-scheduler'
 
         - name: DESCHEDULER_CONFIG
-          value: ''
+          value: 'config-kafka-source-descheduler'
 
         resources:
           requests:

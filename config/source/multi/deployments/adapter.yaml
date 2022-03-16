@@ -59,6 +59,8 @@ spec:
           value: '{"Domain":"knative.dev/eventing","Component":"kafkasource","ConfigMap":{"profiling.enable": "false"}}'
         - name: K_LOGGING_CONFIG
           value: '{}'
+        - name: K_TRACING_CONFIG
+          value: '{"backend":"zipkin","debug":"true","sample-rate":"1","zipkin-endpoint":"http://otel-collector.observability:9411/api/v2/spans"}'
         - name: K_LEADER_ELECTION_CONFIG
           value: ''
         - name: METRICS_DOMAIN

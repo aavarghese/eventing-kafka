@@ -273,7 +273,10 @@ func (s *stateBuilder) State(reserved map[types.NamespacedName]map[string]int32)
 			// Account for reserved vreplicas
 			vreplicas = withReserved(vpod.GetKey(), podName, vreplicas, reserved)
 
-			free, last = s.updateFreeCapacity(free, last, podName, vreplicas)
+			free, last, err = s.updateFreeCapacity(free, last, podName, vreplicas)
+			if err != nil {
+				return nil, err
+			}
 
 			withPlacement[vpod.GetKey()][podName] = true
 
@@ -317,7 +320,10 @@ func (s *stateBuilder) State(reserved map[types.NamespacedName]map[string]int32)
 				}
 			}
 
-			free, last = s.updateFreeCapacity(free, last, podName, rvreplicas)
+			free, last, err = s.updateFreeCapacity(free, last, podName, rvreplicas)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -327,7 +333,7 @@ func (s *stateBuilder) State(reserved map[types.NamespacedName]map[string]int32)
 		PodSpread: podSpread, NodeSpread: nodeSpread, ZoneSpread: zoneSpread}, nil
 }
 
-func (s *stateBuilder) updateFreeCapacity(free []int32, last int32, podName string, vreplicas int32) ([]int32, int32) {
+func (s *stateBuilder) updateFreeCapacity(free []int32, last int32, podName string, vreplicas int32) ([]int32, int32, error) {
 	ordinal := OrdinalFromPodName(podName)
 	free = grow(free, ordinal, s.capacity)
 
@@ -335,15 +341,16 @@ func (s *stateBuilder) updateFreeCapacity(free []int32, last int32, podName stri
 
 	// Assert the pod is not overcommitted
 	if free[ordinal] < 0 {
-		// This should not happen anymore. Log as an error but do not interrupt the current scheduling.
+		// This should not happen anymore.
 		s.logger.Errorw("pod is overcommitted", zap.String("podName", podName), zap.Int32("free", free[ordinal]))
+		return free, last, fmt.Errorf("pod is overcommitted - need to resechedule")
 	}
 
 	if ordinal > last && free[ordinal] != s.capacity {
 		last = ordinal
 	}
 
-	return free, last
+	return free, last, nil
 }
 
 func grow(slice []int32, ordinal int32, def int32) []int32 {
